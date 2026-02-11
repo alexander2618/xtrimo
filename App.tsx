@@ -12,6 +12,8 @@ import { generateAIResponse } from './services/geminiService';
 import { KnowledgeSelector } from './components/KnowledgeSelector';
 import { ExperimentWorkbench } from './components/ExperimentWorkbench';
 import { ProtocolManager } from './components/ProtocolManager';
+import { KnowledgeGarden } from './components/KnowledgeGarden';
+import { MOCK_ELISA_TEMPLATE } from './constants';
 
 // Mock Knowledge Bases for reference in App
 const MOCK_DB_REF: Record<string, string> = {
@@ -23,30 +25,7 @@ const MOCK_DB_REF: Record<string, string> = {
   'f-3': 'Protein_Structure.docx'
 };
 
-// Mock PTC Data
-const MOCK_ELISA_TEMPLATE: PTCTemplate = {
-  id: 'ptc-elisa-001',
-  title: 'Sandwich ELISA Protocol (High Sensitivity)',
-  description: '用于检测低浓度蛋白质样品的双抗体夹心法，适用于血清及细胞培养上清。',
-  tags: ['Immunology', 'Screening', 'Quantitative'],
-  equipment: [],
-  reagents: [],
-  blocks: [
-    { id: 'b1', type: 'heading', content: '1. 包被 (Coating)' },
-    { id: 'b2', type: 'instruction', content: '将捕获抗体稀释至 1-10 µg/mL (PBS, pH 7.4)。', checked: false, params: { '浓度': '5 µg/mL', '缓冲液': 'PBS' } },
-    { id: 'b3', type: 'instruction', content: '每孔加入 100 µL，4°C 过夜孵育。', checked: false, params: { '体积': '100 µL', '温度': '4°C' } },
-    { id: 'b4', type: 'heading', content: '2. 封闭 (Blocking)' },
-    { id: 'b5', type: 'instruction', content: '洗涤 3 次 (PBS + 0.05% Tween 20)。', checked: false },
-    { id: 'b6', type: 'instruction', content: '加入 200 µL 封闭液 (1% BSA/PBS)，室温孵育 1-2 小时。', checked: false, params: { '体积': '200 µL', '时间': '2h' } },
-    { id: 'b7', type: 'heading', content: '3. 加样与检测 (Sample & Detection)' },
-    { id: 'b8', type: 'checklist', content: '加入 100 µL 待测样品或标准品。', checked: false, params: { '体积': '100 µL' } },
-    { id: 'b9', type: 'checklist', content: '加入检测抗体 (生物素标记)，室温孵育 1h。', checked: false },
-    { id: 'b10', type: 'checklist', content: '加入 HRP-Streptavidin，孵育 30min。', checked: false },
-    { id: 'b11', type: 'checklist', content: '加入 TMB 显色，酸终止后读取 OD450。', checked: false }
-  ]
-};
-
-type ViewMode = 'chat' | 'protocol_manager' | 'workbench';
+type ViewMode = 'chat' | 'protocol_manager' | 'workbench' | 'knowledge_garden';
 
 const BioTabs: React.FC<{ result: BioAnalysisResult }> = ({ result }) => {
   const [tab, setTab] = useState<'summary' | 'code'>('summary');
@@ -253,7 +232,6 @@ export const App: React.FC = () => {
 
   // Logic for Experiment Design Flow
   const performExperimentFlow = async (query: string) => {
-    // 1. Guardrail Check (Simple Mock)
     if (!query.toLowerCase().includes('elisa') && !query.toLowerCase().includes('design') && !query.toLowerCase().includes('protocol') && !query.toLowerCase().includes('实验')) {
       setMessages(prev => [...prev, {
         id: Date.now().toString(),
@@ -264,8 +242,6 @@ export const App: React.FC = () => {
       return;
     }
 
-    // 2. Scenario Confirmation & Retrieval
-    // Simulating: Found > 3 results, or need clarification
     if (query.length < 10) {
       setMessages(prev => [...prev, {
         id: Date.now().toString(),
@@ -276,12 +252,11 @@ export const App: React.FC = () => {
       return;
     }
 
-    // 3. Exact Match / List Display
     await new Promise(r => setTimeout(r, 1000));
     setMessages(prev => [...prev, {
       id: Date.now().toString(),
       role: 'assistant',
-      content: "已检索到 3 个相关 PTC 模板。推荐使用 **Sandwich ELISA (High Sensitivity)**。",
+      content: "已检索到 3 个相关 PTC 模板。推荐使用 **ELISA 标准操作流程 (Sandwich Method)**。",
       timestamp: Date.now(),
       ptcSuggestions: [MOCK_ELISA_TEMPLATE]
     }]);
@@ -316,8 +291,9 @@ export const App: React.FC = () => {
   const handleSidebarNavigate = (key: string) => {
     if (key === 'protocol') {
       setViewMode('protocol_manager');
+    } else if (key === 'garden') {
+      setViewMode('knowledge_garden');
     } else {
-        // Default behavior for other tabs: go to chat
         setViewMode('chat');
     }
   };
@@ -326,7 +302,6 @@ export const App: React.FC = () => {
     <div className="flex h-screen bg-slate-50 overflow-hidden relative">
       <Sidebar onNavigate={handleSidebarNavigate} />
       
-      {/* Main Content Area: Swaps based on View Mode */}
       <main className="flex-1 flex overflow-hidden relative">
         
         {viewMode === 'protocol_manager' ? (
@@ -343,8 +318,11 @@ export const App: React.FC = () => {
                     onClose={() => setViewMode('protocol_manager')} 
                 />
              </div>
+        ) : viewMode === 'knowledge_garden' ? (
+             <div className="w-full h-full flex flex-col">
+                <KnowledgeGarden />
+             </div>
         ) : (
-            // Default Chat View
             <>
                 <div className={`flex-1 flex flex-col transition-all duration-300 ${isResearchPanelOpen ? 'mr-80' : ''}`}>
                 <div className="flex-1 overflow-y-auto px-6 pb-64 pt-12 max-w-4xl mx-auto w-full no-scrollbar" ref={scrollRef}>
@@ -370,7 +348,6 @@ export const App: React.FC = () => {
                             <div className={`max-w-[90%] p-5 rounded-3xl shadow-sm border ${
                             msg.role === 'user' ? 'bg-blue-600 text-white border-blue-500' : 'bg-white text-gray-800 border-gray-100'
                             }`}>
-                            {/* Retrieval Logic Section (Gray Background) */}
                             {msg.role === 'assistant' && msg.retrievalLogic && (
                                 <div className="mb-4 p-4 bg-gray-50 border border-gray-100 rounded-2xl animate-fade-in">
                                 <div className="flex items-center gap-2 mb-2 text-gray-400">
@@ -405,7 +382,6 @@ export const App: React.FC = () => {
                                 </div>
                             )}
 
-                            {/* PTC Suggestions Card */}
                             {msg.ptcSuggestions && msg.ptcSuggestions.map(ptc => (
                                 <div key={ptc.id} className="mt-4 border border-indigo-100 bg-indigo-50/30 rounded-2xl p-4 transition-all hover:bg-indigo-50 group">
                                 <div className="flex justify-between items-start mb-2">
@@ -445,11 +421,9 @@ export const App: React.FC = () => {
                     )}
                 </div>
 
-                {/* Bottom Control Bar */}
                 <div className="absolute bottom-0 left-0 right-0 p-6 pointer-events-none">
                     <div className="max-w-4xl mx-auto w-full pointer-events-auto bg-white rounded-3xl shadow-2xl border border-gray-100 p-2 relative flex flex-col gap-2">
                     
-                    {/* Tab Selector */}
                     <div className="flex justify-center -mt-14 mb-2">
                         <div className="inline-flex p-1 bg-white border border-gray-100 rounded-full shadow-lg">
                         {[
@@ -466,9 +440,7 @@ export const App: React.FC = () => {
                         </div>
                     </div>
 
-                    {/* Toolbar Area */}
                     <div className="flex flex-col gap-2 px-3 relative">
-                        {/* Knowledge Selector Popover */}
                         {showKnowledgeSelector && (
                         <KnowledgeSelector 
                             onClose={() => setShowKnowledgeSelector(false)}
@@ -486,7 +458,6 @@ export const App: React.FC = () => {
                         <div className="flex items-center gap-3 py-2 border-b border-gray-50 overflow-x-auto no-scrollbar">
                         {activeTab === 'basic' && (
                             <div className="flex items-center gap-4">
-                            {/* Tools and Reasoning Buttons */}
                             <button className="flex items-center gap-1.5 px-3 py-1.5 bg-gray-50 hover:bg-gray-100 text-gray-600 rounded-xl text-[11px] font-bold transition-colors">
                                 <Settings size={14} /> 工具
                             </button>
@@ -500,7 +471,6 @@ export const App: React.FC = () => {
                                 <Search size={14} /> 联网搜索
                             </button>
 
-                            {/* New Knowledge Context Button */}
                             <button 
                                 onClick={() => setShowKnowledgeSelector(!showKnowledgeSelector)}
                                 className={`flex items-center gap-2 px-3 py-1.5 rounded-xl text-[11px] font-bold border transition-all ${
@@ -546,7 +516,6 @@ export const App: React.FC = () => {
                         )}
                         </div>
 
-                        {/* Main Input Area */}
                         <div className="flex items-center gap-3 px-1 pb-1">
                         <input 
                             type="text" 
@@ -578,7 +547,6 @@ export const App: React.FC = () => {
             </>
         )}
 
-        {/* Side Panels */}
         {isResearchPanelOpen && viewMode === 'chat' && (
           <div className="w-80 border-l border-gray-100 bg-white flex flex-col animate-slide-in shadow-2xl z-40 overflow-hidden">
             <div className="p-5 border-b border-gray-50 flex items-center justify-between bg-white sticky top-0">

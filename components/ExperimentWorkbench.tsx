@@ -41,11 +41,12 @@ const PLASMID_MOCK: PTCTemplate = {
 };
 
 export const ExperimentWorkbench: React.FC<ExperimentWorkbenchProps> = ({ initialTemplate, onClose }) => {
-  const templateToUse = (initialTemplate?.id === 'elisa' || !initialTemplate || initialTemplate.id === 'ptc-elisa-001') ? PLASMID_MOCK : initialTemplate;
+  // Use initialTemplate if available, otherwise fallback to Plasmid Mock
+  const templateToUse = initialTemplate || PLASMID_MOCK;
   const [blocks, setBlocks] = useState<ExperimentBlock[]>(templateToUse.blocks || []);
   const [highlightedBlock, setHighlightedBlock] = useState<string | null>(null);
   const [chatMessages, setChatMessages] = useState<Message[]>([
-    { id: 'welcome', role: 'assistant', content: '工作台已就绪。所有步骤编号已根据大纲顺序自动对齐。您可以点击右上方按钮导出 PDF 文档。', timestamp: Date.now() }
+    { id: 'welcome', role: 'assistant', content: `工作台已就绪。针对 ${templateToUse.title} 的所有步骤编号已根据大纲顺序自动对齐。您可以点击右上方按钮导出 PDF 文档。`, timestamp: Date.now() }
   ]);
 
   const blockRefs = useRef<Record<string, HTMLDivElement | null>>({});
@@ -140,6 +141,7 @@ export const ExperimentWorkbench: React.FC<ExperimentWorkbenchProps> = ({ initia
                              <span className="text-[10px] text-gray-400 block font-normal">{eq.spec || eq.model}</span>
                            </div>
                        ))}
+                       {templateToUse.equipment?.length === 0 && <p className="text-[10px] text-gray-400">暂无设备信息</p>}
                    </div>
                </div>
                <div className="bg-white rounded-xl shadow-sm border border-gray-200 p-5">
@@ -153,6 +155,7 @@ export const ExperimentWorkbench: React.FC<ExperimentWorkbenchProps> = ({ initia
                              <span className="text-[10px] text-blue-400 block font-mono">{re.catNum}</span>
                            </div>
                        ))}
+                       {templateToUse.reagents?.length === 0 && <p className="text-[10px] text-gray-400">暂无试剂信息</p>}
                    </div>
                </div>
             </div>
@@ -160,7 +163,6 @@ export const ExperimentWorkbench: React.FC<ExperimentWorkbenchProps> = ({ initia
             {/* Steps Content Area */}
             <div className="space-y-4">
               {blocks.map((block) => {
-                // Find relative index for re-numbering if it's a heading
                 const headingIndex = headings.findIndex(h => h.id === block.id);
                 
                 return (

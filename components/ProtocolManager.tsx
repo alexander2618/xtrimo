@@ -10,6 +10,7 @@ import {
 import { PTCTemplate } from '../types';
 import { ProtocolImport } from './ProtocolImport';
 import { ProtocolCreator } from './ProtocolCreator';
+import { MOCK_ELISA_TEMPLATE } from '../constants';
 
 interface ProtocolManagerProps {
   onClose: () => void;
@@ -57,14 +58,7 @@ const CATEGORY_TREE: CategoryNode[] = [
 // --- Mock Data Matching Screenshot ---
 const SCREENSHOT_TEMPLATES: PTCTemplate[] = [
   {
-    id: 'elisa',
-    title: 'ELISA 标准操作流程',
-    description: '用于检测样品中特定蛋白质浓度的酶联免疫吸附测定标准流程，包含包被、封闭、加样、显色等完整步骤。',
-    tags: ['ELISA', '蛋白质检测', '免疫学'],
-    category: '免疫检测',
-    date: '2024/1/15',
-    version: 'V1.0',
-    blocks: []
+    ...MOCK_ELISA_TEMPLATE
   },
   {
     id: 'wb',

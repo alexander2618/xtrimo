@@ -25,7 +25,10 @@ export const Sidebar: React.FC<SidebarProps> = ({ onNavigate }) => {
       </div>
 
       <div className="px-3 mb-6">
-        <button className="w-full flex items-center gap-2 px-3 py-2 border border-blue-200 text-blue-600 rounded-lg bg-blue-50 hover:bg-blue-100 transition-colors">
+        <button 
+          onClick={() => onNavigate?.('chat')}
+          className="w-full flex items-center gap-2 px-3 py-2 border border-blue-200 text-blue-600 rounded-lg bg-blue-50 hover:bg-blue-100 transition-colors"
+        >
           <Plus size={18} />
           <span className="font-medium">新建对话</span>
         </button>
