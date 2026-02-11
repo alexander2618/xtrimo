@@ -426,7 +426,6 @@ export const App: React.FC = () => {
                         ))}
                     </div>
                     )}
-                </div>
 
                 <div className="absolute bottom-0 left-0 right-0 p-6 pointer-events-none">
                     <div className="max-w-4xl mx-auto w-full pointer-events-auto bg-white rounded-3xl shadow-2xl border border-gray-100 p-2 relative flex flex-col gap-2">
@@ -550,6 +549,7 @@ export const App: React.FC = () => {
                         </div>
                     </div>
                     </div>
+                </div>
                 </div>
             </>
         )}
