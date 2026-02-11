@@ -2,9 +2,9 @@ name: Build and Deploy
 
 on:
   push:
-    branches: [main, master]
+    branches: [gh-wf]
   pull_request:
-    branches: [main, master]
+    branches: [gh-wf]
   workflow_dispatch:
     inputs:
       deploy_target:
