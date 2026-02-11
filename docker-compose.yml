@@ -1,0 +1,16 @@
+version: '3.8'
+
+services:
+  xtrimo:
+    build:
+      context: .
+      dockerfile: Dockerfile
+      args:
+        - GEMINI_API_KEY=${GEMINI_API_KEY}
+    image: xtrimo-discovery-assistant:latest
+    container_name: xtrimo
+    ports:
+      - "3000:80"
+    restart: unless-stopped
+    environment:
+      - NODE_ENV=production
