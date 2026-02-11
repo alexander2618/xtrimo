@@ -2,14 +2,15 @@
 import React from 'react';
 import { 
   Plus, LayoutGrid, FileText, Database, 
-  Search, History, User, ChevronLeft, FlaskConical
+  Search, ChevronLeft, FlaskConical
 } from 'lucide-react';
 
 interface SidebarProps {
   onNavigate?: (key: string) => void;
+  activeKey?: string;
 }
 
-export const Sidebar: React.FC<SidebarProps> = ({ onNavigate }) => {
+export const Sidebar: React.FC<SidebarProps> = ({ onNavigate, activeKey = 'chat' }) => {
   return (
     <aside className="w-64 h-screen border-r border-gray-200 bg-white flex flex-col flex-shrink-0">
       <div className="p-4 flex items-center justify-between">
@@ -27,7 +28,11 @@ export const Sidebar: React.FC<SidebarProps> = ({ onNavigate }) => {
       <div className="px-3 mb-6">
         <button 
           onClick={() => onNavigate?.('chat')}
-          className="w-full flex items-center gap-2 px-3 py-2 border border-blue-200 text-blue-600 rounded-lg bg-blue-50 hover:bg-blue-100 transition-colors"
+          className={`w-full flex items-center gap-2 px-3 py-2 border rounded-lg transition-colors ${
+            activeKey === 'chat' 
+              ? 'bg-blue-50 border-blue-200 text-blue-600 shadow-sm' 
+              : 'bg-white border-gray-200 text-gray-600 hover:bg-gray-50 hover:border-gray-300'
+          }`}
         >
           <Plus size={18} />
           <span className="font-medium">新建对话</span>
@@ -44,7 +49,11 @@ export const Sidebar: React.FC<SidebarProps> = ({ onNavigate }) => {
           <button 
             key={item.key} 
             onClick={() => onNavigate?.(item.key)}
-            className="w-full flex items-center gap-3 px-3 py-2 text-gray-600 hover:bg-gray-50 rounded-lg transition-colors"
+            className={`w-full flex items-center gap-3 px-3 py-2 rounded-lg transition-colors ${
+              activeKey === item.key 
+                ? 'bg-blue-50 text-blue-600 font-bold' 
+                : 'text-gray-600 hover:bg-gray-50'
+            }`}
           >
             <item.icon size={18} />
             <span className="text-sm">{item.label}</span>

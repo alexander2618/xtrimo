@@ -1,12 +1,12 @@
 
 import React, { useState, useRef, useEffect } from 'react';
 import { Sidebar } from './components/Sidebar';
-import { TabType, Message, ResearchStep, BioAnalysisResult, KnowledgeItem, KnowledgeMode, PTCTemplate, ExperimentBlock } from './types';
+import { TabType, Message, ResearchStep, BioAnalysisResult, KnowledgeMode, PTCTemplate } from './types';
 import { 
   Sparkles, Zap, Brain, BookOpen, Paperclip, Send, 
   ChevronDown, Settings, Microscope, Search, ExternalLink,
-  TestTube, Target, Upload, File, X, CheckCircle2, ChevronRight, Download, Code, Info, Loader2, Activity,
-  Check, Plus, ShieldCheck, Filter, Terminal, Layers, FlaskConical, Play
+  TestTube, Target, Upload, File, X, CheckCircle2, ChevronRight, Loader2, Activity,
+  Check, Layers, FlaskConical, Play, Info
 } from 'lucide-react';
 import { generateAIResponse } from './services/geminiService';
 import { KnowledgeSelector } from './components/KnowledgeSelector';
@@ -298,9 +298,16 @@ export const App: React.FC = () => {
     }
   };
 
+  // Determine active key for Sidebar
+  const getActiveSidebarKey = () => {
+    if (viewMode === 'knowledge_garden') return 'garden';
+    if (viewMode === 'protocol_manager' || viewMode === 'workbench') return 'protocol';
+    return 'chat';
+  };
+
   return (
     <div className="flex h-screen bg-slate-50 overflow-hidden relative">
-      <Sidebar onNavigate={handleSidebarNavigate} />
+      <Sidebar onNavigate={handleSidebarNavigate} activeKey={getActiveSidebarKey()} />
       
       <main className="flex-1 flex overflow-hidden relative">
         
