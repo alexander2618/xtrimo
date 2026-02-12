@@ -6,11 +6,10 @@ services:
       context: .
       dockerfile: Dockerfile
       args:
-        - GEMINI_API_KEY=${GEMINI_API_KEY}
+        # API Key 为可选，取消注释下行以启用 AI 功能
+        # - GEMINI_API_KEY=${GEMINI_API_KEY}
     image: xtrimo-discovery-assistant:latest
     container_name: xtrimo
     ports:
       - "3000:80"
     restart: unless-stopped
-    environment:
-      - NODE_ENV=production

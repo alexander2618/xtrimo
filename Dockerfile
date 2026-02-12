@@ -12,7 +12,7 @@ RUN npm ci
 # 复制源代码
 COPY . .
 
-# 构建（GEMINI_API_KEY 可以在构建时传入）
+# 构建（API Key 为可选）
 ARG GEMINI_API_KEY
 ENV GEMINI_API_KEY=${GEMINI_API_KEY}
 
@@ -23,9 +23,6 @@ FROM nginx:alpine
 
 # 复制构建产物到 Nginx 目录
 COPY --from=builder /app/dist /usr/share/nginx/html
-
-# 复制自定义 Nginx 配置（可选）
-# COPY nginx.conf /etc/nginx/conf.d/default.conf
 
 # 暴露端口
 EXPOSE 80
